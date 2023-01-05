@@ -59,11 +59,22 @@ void setup() {
   }
 
 
-  while (1) {
+
+// put your setup code here, to run once:
+}
+
+void loop() {
+
+  Vector normAccel = mpu.readNormalizeAccel();
+  int PITCH = -(atan2(normAccel.XAxis, sqrt(normAccel.YAxis * normAccel.YAxis + normAccel.ZAxis * normAccel.ZAxis)) * 180.0) / M_PI;
+  int ROLL = (atan2(normAccel.YAxis, normAccel.ZAxis) * 180.0) / M_PI;
+  int KEY_ARMING = 0;
+  int KEY_LAND = 0;
+  int KEY_TAKEOFF = 0;
+
+  if (!isCalibrated) {
+
     cal_cnt++;
-    Vector normAccel = mpu.readNormalizeAccel();
-    int PITCH = -(atan2(normAccel.XAxis, sqrt(normAccel.YAxis * normAccel.YAxis + normAccel.ZAxis * normAccel.ZAxis)) * 180.0) / M_PI;
-    int ROLL = (atan2(normAccel.YAxis, normAccel.ZAxis) * 180.0) / M_PI;
     if (PITCH < last_PITCH) PITCH_MIN = PITCH;
     if (PITCH > last_PITCH) PITCH_MAX = PITCH;
     if (ROLL < last_ROLL) ROLL_MIN = ROLL;
@@ -81,72 +92,58 @@ void setup() {
     digitalWrite(PIN_LED_BACK, LOW);
     digitalWrite(PIN_LED_LEFT, LOW);
     delay(100);
-    if (cal_cnt > CALIBRATE_STEP) {
-      isCalibrated = true;
-      break;
+    if (cal_cnt > CALIBRATE_STEP) isCalibrated = true;
+
+  } else {
+    if (PITCH <= PITCH_MIN) {
+      SIGNAL_LEFT = 1;
+      digitalWrite(PIN_LED_LEFT, HIGH);
+    } else {
+      SIGNAL_LEFT = 0;
+      digitalWrite(PIN_LED_LEFT, LOW);
     }
+
+    if (PITCH >= PITCH_MAX) {
+      SIGNAL_RIGHT = 1;
+      digitalWrite(PIN_LED_RIGHT, HIGH);
+    } else {
+      SIGNAL_RIGHT = 0;
+      digitalWrite(PIN_LED_RIGHT, LOW);
+    }
+
+    if (ROLL <= ROLL_MIN) {
+      SIGNAL_BACK = 1;
+      digitalWrite(PIN_LED_BACK, HIGH);
+    } else {
+      SIGNAL_BACK = 0;
+      digitalWrite(PIN_LED_BACK, LOW);
+    }
+    if (ROLL >= ROLL_MAX) {
+      SIGNAL_FRONT = 1;
+      digitalWrite(PIN_LED_FRONT, HIGH);
+    } else {
+      SIGNAL_FRONT = 0;
+      digitalWrite(PIN_LED_FRONT, LOW);
+    }
+
+    char buffer[10];
+
+    sprintf(buffer, "%d%d%d%d%d%d%d",
+            SIGNAL_FRONT,
+            SIGNAL_RIGHT,
+            SIGNAL_BACK,
+            SIGNAL_LEFT,
+            KEY_ARMING,
+            KEY_LAND,
+            KEY_TAKEOFF);
+
+    wifiUdp.beginPacket(kRemoteIpadr, kRmoteUdpPort);
+    if (isCalibrated) wifiUdp.print(buffer);
+    wifiUdp.endPacket();
+    digitalWrite(LED_BUILTIN, LOW);
+    delay(100);
+    digitalWrite(LED_BUILTIN, HIGH);
+    delay(50);
+    // put your main code here, to run repeatedly:
   }
-  // put your setup code here, to run once:
-}
-
-void loop() {
-
-  Vector normAccel = mpu.readNormalizeAccel();
-  int PITCH = -(atan2(normAccel.XAxis, sqrt(normAccel.YAxis * normAccel.YAxis + normAccel.ZAxis * normAccel.ZAxis)) * 180.0) / M_PI;
-  int ROLL = (atan2(normAccel.YAxis, normAccel.ZAxis) * 180.0) / M_PI;
-  int KEY_1 = 0;
-  int KEY_2 = 0;
-  int KEY_3 = 0;
-
-
-  if (PITCH <= PITCH_MIN) {
-    SIGNAL_LEFT = 1;
-    digitalWrite(PIN_LED_LEFT, HIGH);
-  } else {
-    SIGNAL_LEFT = 0;
-    digitalWrite(PIN_LED_LEFT, LOW);
-  }
-
-  if (PITCH >= PITCH_MAX) {
-    SIGNAL_RIGHT = 1;
-    digitalWrite(PIN_LED_RIGHT, HIGH);
-  } else {
-    SIGNAL_RIGHT = 0;
-    digitalWrite(PIN_LED_RIGHT, LOW);
-  }
-
-  if (ROLL <= ROLL_MIN) {
-    SIGNAL_BACK = 1;
-    digitalWrite(PIN_LED_BACK, HIGH);
-  } else {
-    SIGNAL_BACK = 0;
-    digitalWrite(PIN_LED_BACK, LOW);
-  }
-  if (ROLL >= ROLL_MAX) {
-    SIGNAL_FRONT = 1;
-    digitalWrite(PIN_LED_FRONT, HIGH);
-  } else {
-    SIGNAL_FRONT = 0;
-    digitalWrite(PIN_LED_FRONT, LOW);
-  }
-
-  char buffer[10];
-
-  sprintf(buffer, "%d%d%d%d%d%d%d",
-          SIGNAL_FRONT,
-          SIGNAL_RIGHT,
-          SIGNAL_BACK,
-          SIGNAL_LEFT,
-          KEY_1,
-          KEY_2,
-          KEY_3);
-
-  wifiUdp.beginPacket(kRemoteIpadr, kRmoteUdpPort);
-  if (isCalibrated)wifiUdp.print(buffer);
-  wifiUdp.endPacket();
-  digitalWrite(LED_BUILTIN, LOW);
-  delay(100);
-  digitalWrite(LED_BUILTIN, HIGH);
-  delay(50);
-  // put your main code here, to run repeatedly:
 }
