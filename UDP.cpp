@@ -37,10 +37,10 @@ static void Serial_setup()
 
 int PITCH = 0;
 int ROLL = 0;
-int PITCH_MAX = 0;
-int PITCH_MIN = 0;
-int ROLL_MAX = 0;
-int ROLL_MIN = 0;
+int PITCH_RIGHT = 0;
+int PITCH_LEFT = 0;
+int ROLL_FRONT = 0;
+int ROLL_BACK = 0;
 int last_PITCH = 0;
 int last_ROLL = 0;
 int m_roll = 0;
@@ -50,13 +50,14 @@ const int PIN_LED_FRONT = 5;  //D5
 const int PIN_LED_RIGHT = 8;  //D8
 const int PIN_LED_BACK = 7;   //D7
 const int PIN_LED_LEFT = 6;   //D6
-int CALIBRATE_STEP = 50;
+int CALIBRATE_STEP = 100;
 int cal_cnt = 0;
 int SIGNAL_FRONT = 0;
 int SIGNAL_RIGHT = 0;
 int SIGNAL_BACK = 0;
 int SIGNAL_LEFT = 0;
-
+int step_calibrate = 0;
+int total_ = 0;
 void setup() {
   pinMode(LED_BUILTIN, OUTPUT);
   pinMode(PIN_LED_FRONT, OUTPUT);
@@ -98,47 +99,74 @@ void loop() {
    
     Serial.println("Cari limit sudut ...");
     
-    if (cal_cnt == 0){
-      
-      PITCH_MIN = PITCH;
-      PITCH_MAX = PITCH;
-      ROLL_MIN = ROLL;
-      ROLL_MAX = ROLL;
-      
-      
-    }else{
-    
-    if (PITCH < PITCH_MIN ) PITCH_MIN = PITCH;
-    if (PITCH > PITCH_MAX) PITCH_MAX = PITCH;
-    if (ROLL < ROLL_MIN) ROLL_MIN = ROLL;
-    if (ROLL > ROLL_MAX) ROLL_MAX = ROLL;
-      
+    if (step_calibrate == 0){
+        cal_cnt++;
+        digitalWrite(PIN_LED_FRONT, 1);
+        digitalWrite(PIN_LED_RIGHT, 0);
+        digitalWrite(PIN_LED_BACK, 0);
+        digitalWrite(PIN_LED_LEFT, 0);
+        total_ = total_ + ROLL;
+        if (cal_cnt>=CALIBRATE_STEP){
+          ROLL_FRONT = total_ / cal_cnt;
+          step_calibrate = 1;
+          cal_cnt = 0;
+          total_ = 0;
+        } 
     }
-
-    digitalWrite(PIN_LED_FRONT, HIGH);
-    digitalWrite(PIN_LED_RIGHT, HIGH);
-    digitalWrite(PIN_LED_BACK, HIGH);
-    digitalWrite(PIN_LED_LEFT, HIGH);
-    delay(100);
-    
-    digitalWrite(PIN_LED_FRONT, LOW);
-    digitalWrite(PIN_LED_RIGHT, LOW);
-    digitalWrite(PIN_LED_BACK, LOW);
-    digitalWrite(PIN_LED_LEFT, LOW);
-    delay(100);
-    cal_cnt++;
-    if (cal_cnt > CALIBRATE_STEP) isCalibrated = true;
-
+    if (step_calibrate == 1){
+       cal_cnt++;
+        digitalWrite(PIN_LED_FRONT, 0);
+        digitalWrite(PIN_LED_RIGHT, 1);
+        digitalWrite(PIN_LED_BACK, 0);
+        digitalWrite(PIN_LED_LEFT, 0);
+        total_ = total_ + PITCH;
+        if (cal_cnt >= CALIBRATE_STEP){
+          PITCH_RIGHT = total_ / cal_cnt;
+          step_calibrate = 2;
+          cal_cnt = 0;
+          total_ = 0;
+        }  
+    }
+    if (step_calibrate == 2){
+        cal_cnt++;
+        digitalWrite(PIN_LED_FRONT, 0);
+        digitalWrite(PIN_LED_RIGHT, 0);
+        digitalWrite(PIN_LED_BACK, 1);
+        digitalWrite(PIN_LED_LEFT, 0);
+        total_ = total_ + ROLL;
+        if (cal_cnt >= CALIBRATE_STEP){
+          ROLL_BACK = total_ / cal_cnt;
+          step_calibrate = 3;
+          cal_cnt = 0;
+          total_ = 0;
+        }  
+    }
+    if (step_calibrate == 3){
+        cal_cnt++;
+        digitalWrite(PIN_LED_FRONT, 0);
+        digitalWrite(PIN_LED_RIGHT, 0);
+        digitalWrite(PIN_LED_BACK, 0);
+        digitalWrite(PIN_LED_LEFT, 1);
+        total_ = (total_) + (PITCH);
+        if (cal_cnt >= CALIBRATE_STEP){
+          PITCH_LEFT = total_ / cal_cnt;
+          //step_calibrate = 4;
+          cal_cnt = 0;
+          total_ = 0;
+          isCalibrated = true;
+        }  
+    }
+   delay(50);
   } else {
-    if (PITCH <= PITCH_MIN) {
-      SIGNAL_LEFT = 1;
-      digitalWrite(PIN_LED_LEFT, HIGH);
+    if (ROLL >= ROLL_FRONT) {
+      SIGNAL_FRONT = 1;
+      digitalWrite(PIN_LED_FRONT, HIGH);
     } else {
-      SIGNAL_LEFT = 0;
-      digitalWrite(PIN_LED_LEFT, LOW);
+      SIGNAL_FRONT = 0;
+      digitalWrite(PIN_LED_FRONT, LOW);
     }
 
-    if (PITCH >= PITCH_MAX) {
+    if (PITCH >= PITCH_RIGHT) {
       SIGNAL_RIGHT = 1;
       digitalWrite(PIN_LED_RIGHT, HIGH);
     } else {
@@ -146,19 +174,19 @@ void loop() {
       digitalWrite(PIN_LED_RIGHT, LOW);
     }
 
-    if (ROLL <= ROLL_MIN) {
+    if (ROLL <= ROLL_BACK) {
       SIGNAL_BACK = 1;
       digitalWrite(PIN_LED_BACK, HIGH);
     } else {
       SIGNAL_BACK = 0;
       digitalWrite(PIN_LED_BACK, LOW);
     }
-    if (ROLL >= ROLL_MAX) {
-      SIGNAL_FRONT = 1;
-      digitalWrite(PIN_LED_FRONT, HIGH);
+    if (PITCH >= PITCH_LEFT) {
+      SIGNAL_LEFT = 1;
+      digitalWrite(PIN_LED_LEFT, HIGH);
     } else {
-      SIGNAL_FRONT = 0;
-      digitalWrite(PIN_LED_FRONT, LOW);
+      SIGNAL_LEFT = 0;
+      digitalWrite(PIN_LED_LEFT, LOW);
     }
 
     char buffer[10];
@@ -179,7 +207,7 @@ void loop() {
     }
     wifiUdp.endPacket();
     digitalWrite(LED_BUILTIN, LOW);
-    delay(100);
+    delay(50);
     digitalWrite(LED_BUILTIN, HIGH);
     delay(50);
     // put your main code here, to run repeatedly:
