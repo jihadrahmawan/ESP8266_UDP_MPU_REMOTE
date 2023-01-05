@@ -7,12 +7,33 @@
 
 MPU6050 mpu;
 
-const char ssid[] = "241439321453";  // SSID
-const char pass[] = "27812366";      // password
+const char ssid[] = "krti2021"; // SSID
+const char pass[] = "krti2022";  // password
 
-WiFiUDP wifiUdp;
-const char *kRemoteIpadr = "192.168.100.29";  //IP RASPI
-const int kRmoteUdpPort = 9000;               // PORT
+static WiFiUDP wifiUdp; 
+static const char *kRemoteIpadr = "192.168.100.29"; //IP RASPI
+static const int kRmoteUdpPort = 9000; // PORT
+
+static void WiFi_setup()
+{
+  static const int kLocalPort = 7000;  //ignore
+  WiFi.begin(ssid, pass);
+  while( WiFi.status() != WL_CONNECTED) {
+    Serial.println("Connecting...")
+    digitalWrite(LED_BUILTIN, LOW);
+    delay(250);
+    digitalWrite(LED_BUILTIN, HIGH);
+    delay(250);
+  }  
+  wifiUdp.begin(kLocalPort);
+}
+
+static void Serial_setup()
+{
+  Serial.begin(115200);
+  Serial.println(""); // to separate line  
+}
+              // PORT
 
 int PITCH = 0;
 int ROLL = 0;
@@ -49,17 +70,10 @@ void setup() {
   digitalWrite(PIN_LED_LEFT, LOW);
   digitalWrite(LED_BUILTIN, LOW);
   
-  Serial.begin(115200);
-  const int kLocalPort = 7000;  //ignore
-  WiFi.begin(ssid, pass);
-  while (WiFi.status() != WL_CONNECTED) {
-    Serial.println("Koneksi ke wifi...");
-    digitalWrite(LED_BUILTIN, LOW);
-    delay(100);
-    digitalWrite(LED_BUILTIN, HIGH);
-    delay(100);
-  }
-  wifiUdp.begin(kLocalPort);
+  
+  Serial_setup();
+  WiFi_setup();
+ 
  
   while (!mpu.begin(MPU6050_SCALE_2000DPS, MPU6050_RANGE_2G)) {
     Serial.println("Could not find a valid MPU6050 sensor, check wiring!");
@@ -82,7 +96,7 @@ void loop() {
 
   if (!isCalibrated) {
    
-    Serial.println("Cari limit sudut");
+    Serial.println("Cari limit sudut ...");
     
     if (cal_cnt == 0){
       
@@ -161,7 +175,7 @@ void loop() {
     wifiUdp.beginPacket(kRemoteIpadr, kRmoteUdpPort);
     if (isCalibrated) {
       wifiUdp.print(buffer);
-      Serial.println("Sending UDP");
+      Serial.print("Sending to ROS ! = "); Serial.println(buff);
     }
     wifiUdp.endPacket();
     digitalWrite(LED_BUILTIN, LOW);
