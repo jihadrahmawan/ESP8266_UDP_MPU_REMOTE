@@ -19,7 +19,7 @@ static void WiFi_setup()
   static const int kLocalPort = 7000;  //ignore
   WiFi.begin(ssid, pass);
   while( WiFi.status() != WL_CONNECTED) {
-    Serial.println("Connecting...")
+    Serial.println("Connecting...");
     digitalWrite(LED_BUILTIN, LOW);
     delay(250);
     digitalWrite(LED_BUILTIN, HIGH);
@@ -50,7 +50,7 @@ const int PIN_LED_FRONT = 5;  //D5
 const int PIN_LED_RIGHT = 8;  //D8
 const int PIN_LED_BACK = 7;   //D7
 const int PIN_LED_LEFT = 6;   //D6
-int CALIBRATE_STEP = 100;
+int CALIBRATE_STEP = 70;
 int cal_cnt = 0;
 int SIGNAL_FRONT = 0;
 int SIGNAL_RIGHT = 0;
@@ -105,7 +105,7 @@ void loop() {
         digitalWrite(PIN_LED_RIGHT, 0);
         digitalWrite(PIN_LED_BACK, 0);
         digitalWrite(PIN_LED_LEFT, 0);
-        total_ = total_ + ROLL;
+        total_ = (total_)+ (ROLL);
         if (cal_cnt>=CALIBRATE_STEP){
           ROLL_FRONT = total_ / cal_cnt;
           step_calibrate = 1;
@@ -119,7 +119,7 @@ void loop() {
         digitalWrite(PIN_LED_RIGHT, 1);
         digitalWrite(PIN_LED_BACK, 0);
         digitalWrite(PIN_LED_LEFT, 0);
-        total_ = total_ + PITCH;
+        total_ = (total_) + (PITCH);
         if (cal_cnt >= CALIBRATE_STEP){
           PITCH_RIGHT = total_ / cal_cnt;
           step_calibrate = 2;
@@ -133,7 +133,7 @@ void loop() {
         digitalWrite(PIN_LED_RIGHT, 0);
         digitalWrite(PIN_LED_BACK, 1);
         digitalWrite(PIN_LED_LEFT, 0);
-        total_ = total_ + ROLL;
+        total_ = (total_) + (ROLL);
         if (cal_cnt >= CALIBRATE_STEP){
           ROLL_BACK = total_ / cal_cnt;
           step_calibrate = 3;
@@ -181,7 +181,7 @@ void loop() {
       SIGNAL_BACK = 0;
       digitalWrite(PIN_LED_BACK, LOW);
     }
-    if (PITCH >= PITCH_LEFT) {
+    if (PITCH <= PITCH_LEFT) {
       SIGNAL_LEFT = 1;
       digitalWrite(PIN_LED_LEFT, HIGH);
     } else {
@@ -203,7 +203,7 @@ void loop() {
     wifiUdp.beginPacket(kRemoteIpadr, kRmoteUdpPort);
     if (isCalibrated) {
       wifiUdp.print(buffer);
-      Serial.print("Sending to ROS ! = "); Serial.println(buff);
+      Serial.print("Sending to ROS ! = "); Serial.println(buffer);
     }
     wifiUdp.endPacket();
     digitalWrite(LED_BUILTIN, LOW);
