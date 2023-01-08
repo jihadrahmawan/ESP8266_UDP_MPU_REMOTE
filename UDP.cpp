@@ -65,9 +65,9 @@ const int PIN_LED_RIGHT = D8;  //D8
 const int PIN_LED_BACK = D7;   //D7
 const int PIN_LED_LEFT = D6;   //D6
 const int PIN_KEY_ARMING = A0;
-const int PIN_KEY_TAKEOFF = D0;
-const int PIN_KEY_LAND = D3;
-int CALIBRATE_STEP = 70;
+const int PIN_KEY_TAKEOFF = D3;
+const int PIN_KEY_LAND = DO;
+int CALIBRATE_STEP = 140;
 int cal_cnt = 0;
 int SIGNAL_FRONT = 0;
 int SIGNAL_RIGHT = 0;
@@ -198,6 +198,11 @@ void loop() {
         digitalWrite(PIN_LED_RIGHT, 0);
         digitalWrite(PIN_LED_BACK, 0);
         digitalWrite(PIN_LED_LEFT, 0);
+          Serial.print ("RF = ");Serial.println(ROLL_FRONT);
+           Serial.print ("PR = ");Serial.println(PITCH_LEFT);
+          Serial.print ("RB = ");Serial.println(ROLL_BACK);
+         Serial.print ("PL = ");Serial.println(PITCH_LEFT);
+          
           
           isCalibrated = true;
         }  
@@ -249,7 +254,7 @@ void loop() {
     wifiUdp.beginPacket(kRemoteIpadr, kRmoteUdpPort);
     if (isCalibrated) {
       wifiUdp.print(buffer);
-      Serial.print("Sending to ROS ! = "); Serial.println(buffer);
+      //Serial.print("Sending to ROS ! = "); Serial.println(buffer);
     }
     wifiUdp.endPacket();
     digitalWrite(LED_BUILTIN, LOW);
