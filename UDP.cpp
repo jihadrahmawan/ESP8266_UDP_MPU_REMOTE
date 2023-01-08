@@ -64,6 +64,9 @@ const int PIN_LED_FRONT = D5;  //D5
 const int PIN_LED_RIGHT = D8;  //D8
 const int PIN_LED_BACK = D7;   //D7
 const int PIN_LED_LEFT = D6;   //D6
+const int PIN_KEY_ARMING = A0;
+const int PIN_KEY_TAKEOFF = D0;
+const int PIN_KEY_LAND = D3;
 int CALIBRATE_STEP = 70;
 int cal_cnt = 0;
 int SIGNAL_FRONT = 0;
@@ -72,18 +75,20 @@ int SIGNAL_BACK = 0;
 int SIGNAL_LEFT = 0;
 int step_calibrate = 0;
 int total_ = 0;
+int key_push = 0;
 void setup() {
   pinMode(LED_BUILTIN, OUTPUT);
   pinMode(PIN_LED_FRONT, OUTPUT);
   pinMode(PIN_LED_RIGHT, OUTPUT);
   pinMode(PIN_LED_BACK, OUTPUT);
   pinMode(PIN_LED_LEFT, OUTPUT);
-  
+  pinMode(PIN_KEY_TAKEOFF, INPUT_PULLUP);
   digitalWrite(PIN_LED_FRONT, LOW);
   digitalWrite(PIN_LED_RIGHT, LOW);
   digitalWrite(PIN_LED_BACK, LOW);
   digitalWrite(PIN_LED_LEFT, LOW);
   digitalWrite(LED_BUILTIN, LOW);
+  
   
   
   Serial_setup();
@@ -107,13 +112,20 @@ void loop() {
   ROLL = (atan2(normAccel.YAxis, normAccel.ZAxis) * 180.0) / M_PI;
   int KEY_ARMING = 0;
   int KEY_LAND = 0;
-  int KEY_TAKEOFF = 0;
+  int KEY_TAKEOFF = digitalRead(PIN_KEY_TAKEOFF);
 
   if (!isCalibrated) {
    
     Serial.println("Cari limit sudut ...");
+    if (!KEY_TAKEOFF){
+      key_push++;
+      if (key_push == 2 ){
+        step_calibrate++;
+      }
+      
+    }
     
-    if (step_calibrate == 0){
+    if (step_calibrate == 1){
         cal_cnt++;
         digitalWrite(PIN_LED_FRONT, 1);
         digitalWrite(PIN_LED_RIGHT, 0);
@@ -122,12 +134,17 @@ void loop() {
         total_ = (total_)+ (ROLL);
         if (cal_cnt>=CALIBRATE_STEP){
           ROLL_FRONT = total_ / cal_cnt;
-          step_calibrate = 1;
+          //step_calibrate = 1;
           cal_cnt = 0;
           total_ = 0;
+          key_push=0;
+           digitalWrite(PIN_LED_FRONT, 0);
+        digitalWrite(PIN_LED_RIGHT, 0);
+        digitalWrite(PIN_LED_BACK, 0);
+        digitalWrite(PIN_LED_LEFT, 0);
         } 
     }
-    if (step_calibrate == 1){
+    if (step_calibrate == 2){
        cal_cnt++;
         digitalWrite(PIN_LED_FRONT, 0);
         digitalWrite(PIN_LED_RIGHT, 1);
@@ -136,12 +153,17 @@ void loop() {
         total_ = (total_) + (PITCH);
         if (cal_cnt >= CALIBRATE_STEP){
           PITCH_RIGHT = total_ / cal_cnt;
-          step_calibrate = 2;
+          //step_calibrate = 2;
           cal_cnt = 0;
           total_ = 0;
+          key_push=0;
+           digitalWrite(PIN_LED_FRONT, 0);
+        digitalWrite(PIN_LED_RIGHT, 0);
+        digitalWrite(PIN_LED_BACK, 0);
+        digitalWrite(PIN_LED_LEFT, 0);
         }  
     }
-    if (step_calibrate == 2){
+    if (step_calibrate == 3){
         cal_cnt++;
         digitalWrite(PIN_LED_FRONT, 0);
         digitalWrite(PIN_LED_RIGHT, 0);
@@ -150,12 +172,17 @@ void loop() {
         total_ = (total_) + (ROLL);
         if (cal_cnt >= CALIBRATE_STEP){
           ROLL_BACK = total_ / cal_cnt;
-          step_calibrate = 3;
+          //step_calibrate = 3;
           cal_cnt = 0;
           total_ = 0;
+          key_push = 0;
+           digitalWrite(PIN_LED_FRONT, 0);
+        digitalWrite(PIN_LED_RIGHT, 0);
+        digitalWrite(PIN_LED_BACK, 0);
+        digitalWrite(PIN_LED_LEFT, 0);
         }  
     }
-    if (step_calibrate == 3){
+    if (step_calibrate == 4){
         cal_cnt++;
         digitalWrite(PIN_LED_FRONT, 0);
         digitalWrite(PIN_LED_RIGHT, 0);
@@ -167,6 +194,11 @@ void loop() {
           //step_calibrate = 4;
           cal_cnt = 0;
           total_ = 0;
+           digitalWrite(PIN_LED_FRONT, 0);
+        digitalWrite(PIN_LED_RIGHT, 0);
+        digitalWrite(PIN_LED_BACK, 0);
+        digitalWrite(PIN_LED_LEFT, 0);
+          
           isCalibrated = true;
         }  
     }
