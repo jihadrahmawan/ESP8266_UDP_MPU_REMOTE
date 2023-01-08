@@ -46,6 +46,7 @@ int last_ROLL = 0;
 int m_roll = 0;
 int m_pitch = 0;
 bool isCalibrated = false;
+
 /*
 Labelled WeMos Pin Number	Arduino Pin Number constant to use 	“Real” Microcontroller Pin Number
 Digital Pin 0	D0	16
@@ -77,6 +78,7 @@ int step_calibrate = 0;
 int total_ = 0;
 int key_push = 0;
 bool keypushed = false;
+int widder = 20;
 void setup() {
   pinMode(LED_BUILTIN, OUTPUT);
   pinMode(PIN_LED_FRONT, OUTPUT);
@@ -205,10 +207,10 @@ void loop() {
         digitalWrite(PIN_LED_RIGHT, 0);
         digitalWrite(PIN_LED_BACK, 0);
         digitalWrite(PIN_LED_LEFT, 0);
-          Serial.print ("RF = ");Serial.println(ROLL_FRONT);
-           Serial.print ("PR = ");Serial.println(PITCH_RIGHT);
-          Serial.print ("RB = ");Serial.println(ROLL_BACK);
-         Serial.print ("PL = ");Serial.println(PITCH_LEFT);
+          Serial.print ("RF = ");Serial.println(ROLL_FRONT + widder);
+           Serial.print ("PR = ");Serial.println(PITCH_RIGHT + widder);
+          Serial.print ("RB = ");Serial.println(ROLL_BACK - widder);
+         Serial.print ("PL = ");Serial.println(PITCH_LEFT - widder);
           
           
           isCalibrated = true;
@@ -216,7 +218,7 @@ void loop() {
     }
    delay(50);
   } else {
-    if (ROLL >= ROLL_FRONT) {
+    if (ROLL >= (ROLL_FRONT + widder)) {
       SIGNAL_FRONT = 1;
       digitalWrite(PIN_LED_FRONT, HIGH);
     } else {
@@ -224,7 +226,7 @@ void loop() {
       digitalWrite(PIN_LED_FRONT, LOW);
     }
 
-    if (PITCH >= PITCH_RIGHT) {
+    if (PITCH >= (PITCH_RIGHT + widder)) {
       SIGNAL_RIGHT = 1;
       digitalWrite(PIN_LED_RIGHT, HIGH);
     } else {
@@ -232,14 +234,14 @@ void loop() {
       digitalWrite(PIN_LED_RIGHT, LOW);
     }
 
-    if (ROLL <= ROLL_BACK) {
+    if (ROLL <= (ROLL_BACK - widder)) {
       SIGNAL_BACK = 1;
       digitalWrite(PIN_LED_BACK, HIGH);
     } else {
       SIGNAL_BACK = 0;
       digitalWrite(PIN_LED_BACK, LOW);
     }
-    if (PITCH <= PITCH_LEFT) {
+    if (PITCH <= (PITCH_LEFT - widder)) {
       SIGNAL_LEFT = 1;
       digitalWrite(PIN_LED_LEFT, HIGH);
     } else {
