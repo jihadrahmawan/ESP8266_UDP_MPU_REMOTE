@@ -117,7 +117,8 @@ void loop() {
   int KEY_ARMING = 0;
   int KEY_LAND = 0;
   int KEY_TAKEOFF = digitalRead(PIN_KEY_TAKEOFF);
-
+  
+  /*
   if (!isCalibrated) {
    
     Serial.println("Cari limit sudut ...");
@@ -218,6 +219,7 @@ void loop() {
     }
    delay(50);
   } else {
+  
     if (ROLL >= (ROLL_FRONT + widder)) {
       SIGNAL_FRONT = 1;
       digitalWrite(PIN_LED_FRONT, HIGH);
@@ -272,4 +274,8 @@ void loop() {
     delay(50);
     // put your main code here, to run repeatedly:
   }
+  */
+  Serial.print("PICTH = "); Serial.println(PITCH);
+  Serial.print("ROLL = "); Serial.println(ROLL);
+  delay(100);
 }
