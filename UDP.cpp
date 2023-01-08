@@ -205,7 +205,7 @@ void loop() {
         digitalWrite(PIN_LED_BACK, 0);
         digitalWrite(PIN_LED_LEFT, 0);
           Serial.print ("RF = ");Serial.println(ROLL_FRONT);
-           Serial.print ("PR = ");Serial.println(PITCH_LEFT);
+           Serial.print ("PR = ");Serial.println(PITCH_RIGHT);
           Serial.print ("RB = ");Serial.println(ROLL_BACK);
          Serial.print ("PL = ");Serial.println(PITCH_LEFT);
           
