@@ -46,6 +46,20 @@ int last_ROLL = 0;
 int m_roll = 0;
 int m_pitch = 0;
 bool isCalibrated = false;
+/*
+Labelled WeMos Pin Number	Arduino Pin Number constant to use 	“Real” Microcontroller Pin Number
+Digital Pin 0	D0	16
+Digital Pin 1	D1	5
+Digital Pin 2	D2	4
+Digital Pin 3	D3	0
+Digital Pin 4	D4	2
+Digital Pin 5	D5	14
+Digital Pin 6	D6	12
+Digital Pin 7	D7	13
+Digital Pin 8	D8	15
+TX	TX	1
+RX	RX	3
+*/
 const int PIN_LED_FRONT = D5;  //D5
 const int PIN_LED_RIGHT = D8;  //D8
 const int PIN_LED_BACK = D7;   //D7
