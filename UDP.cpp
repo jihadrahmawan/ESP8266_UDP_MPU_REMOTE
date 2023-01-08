@@ -76,6 +76,7 @@ int SIGNAL_LEFT = 0;
 int step_calibrate = 0;
 int total_ = 0;
 int key_push = 0;
+bool keypushed = false;
 void setup() {
   pinMode(LED_BUILTIN, OUTPUT);
   pinMode(PIN_LED_FRONT, OUTPUT);
@@ -120,12 +121,13 @@ void loop() {
     if (!KEY_TAKEOFF){
       key_push++;
       if (key_push == 2 ){
+        keypushed = true
         step_calibrate++;
       }
       
     }
     
-    if (step_calibrate == 1){
+    if (step_calibrate == 1 && keypushed == true){
         cal_cnt++;
         digitalWrite(PIN_LED_FRONT, 1);
         digitalWrite(PIN_LED_RIGHT, 0);
@@ -138,13 +140,14 @@ void loop() {
           cal_cnt = 0;
           total_ = 0;
           key_push=0;
+          keypushed=false;
            digitalWrite(PIN_LED_FRONT, 0);
         digitalWrite(PIN_LED_RIGHT, 0);
         digitalWrite(PIN_LED_BACK, 0);
         digitalWrite(PIN_LED_LEFT, 0);
         } 
     }
-    if (step_calibrate == 2){
+    if (step_calibrate == 2  && keypushed == true){
        cal_cnt++;
         digitalWrite(PIN_LED_FRONT, 0);
         digitalWrite(PIN_LED_RIGHT, 1);
@@ -157,13 +160,14 @@ void loop() {
           cal_cnt = 0;
           total_ = 0;
           key_push=0;
+          keypushed=false;
            digitalWrite(PIN_LED_FRONT, 0);
         digitalWrite(PIN_LED_RIGHT, 0);
         digitalWrite(PIN_LED_BACK, 0);
         digitalWrite(PIN_LED_LEFT, 0);
         }  
     }
-    if (step_calibrate == 3){
+    if (step_calibrate == 3  && keypushed == true){
         cal_cnt++;
         digitalWrite(PIN_LED_FRONT, 0);
         digitalWrite(PIN_LED_RIGHT, 0);
@@ -176,13 +180,14 @@ void loop() {
           cal_cnt = 0;
           total_ = 0;
           key_push = 0;
+          keypushed=false;
            digitalWrite(PIN_LED_FRONT, 0);
         digitalWrite(PIN_LED_RIGHT, 0);
         digitalWrite(PIN_LED_BACK, 0);
         digitalWrite(PIN_LED_LEFT, 0);
         }  
     }
-    if (step_calibrate == 4){
+    if (step_calibrate == 4  && keypushed == true){
         cal_cnt++;
         digitalWrite(PIN_LED_FRONT, 0);
         digitalWrite(PIN_LED_RIGHT, 0);
@@ -194,6 +199,7 @@ void loop() {
           //step_calibrate = 4;
           cal_cnt = 0;
           total_ = 0;
+          keypushed=false;
            digitalWrite(PIN_LED_FRONT, 0);
         digitalWrite(PIN_LED_RIGHT, 0);
         digitalWrite(PIN_LED_BACK, 0);
